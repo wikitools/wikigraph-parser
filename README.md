@@ -1,2 +1,2 @@
-# WikiGraph Controller
-Mobile app used as input device for WikiGraph in Cave automatic virtual environment
+# WikiGraph Parser
+Command line tool used to parse raw Wikipedia data into files readable by WikiGraph application
