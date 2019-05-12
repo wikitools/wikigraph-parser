@@ -2,18 +2,23 @@ import time
 import re
 import pickle
 import sys
+import os
 
 
 DUMPS_PATH = sys.argv[1] if len(sys.argv) >= 2 else '/'
 if not DUMPS_PATH.endswith('/'):
 	DUMPS_PATH = DUMPS_PATH + '/'
 DATA_FILES_FOLDER = 'data-files/'
+DUMPS_VERSION = sys.argv[2] if len(sys.argv) >= 3 else 'latest'
+
+TITLE_ID_MAP_FILE_NAME = 'title_to_id.map'
+TITLE_ID_MAP_PATH = DATA_FILES_FOLDER + TITLE_ID_MAP_FILE_NAME
 
 
 def create_title_to_id_map():
 	title_to_id = {}
 	start = time.time()
-	with open(DUMPS_PATH + 'enwiki-latest-pages-articles-multistream-index.txt') as f:
+	with open(DUMPS_PATH + 'enwiki-' + DUMPS_VERSION + '-pages-articles-multistream-index.txt') as f:
 		for line in f:
 			line = line[:-1]
 			parts = line.split(':', maxsplit=2)
@@ -26,13 +31,13 @@ def create_title_to_id_map():
 
 def save_title_to_id_map():
 	title_to_id = create_title_to_id_map()
-	with open(DATA_FILES_FOLDER + 'title_to_id.map', 'wb+') as map:
+	with open(TITLE_ID_MAP_PATH, 'wb+') as map:
 		pickle.dump(title_to_id, map)
 
 
 def load_title_to_id_map():
 	start = time.time()
-	with open(DATA_FILES_FOLDER + 'title_to_id.map', 'rb') as map:
+	with open(TITLE_ID_MAP_PATH, 'rb') as map:
 		title_to_id = pickle.load(map)
 		print('Article title to id map loaded in: ' + str(time.time() - start) + 's.')
 		return title_to_id
@@ -41,7 +46,7 @@ def load_title_to_id_map():
 def create_page_links_map(lines_to_proccess=-1, inserts_per_line_to_proccess=-1):
 	start = time.time()
 	links = {}
-	with open(DUMPS_PATH + 'enwiki-latest-pagelinks.sql') as f:
+	with open(DUMPS_PATH + 'enwiki-' + DUMPS_VERSION + '-pagelinks.sql') as f:
 		line_no = 0
 
 		for line in f:
@@ -70,7 +75,9 @@ def create_page_links_map(lines_to_proccess=-1, inserts_per_line_to_proccess=-1)
 	return links
 
 
-# save_title_to_id_map()
+if not os.path.isfile(TITLE_ID_MAP_PATH):
+	os.makedirs(os.path.dirname(TITLE_ID_MAP_PATH))
+	save_title_to_id_map()
 title_to_id = load_title_to_id_map()
 links = create_page_links_map(lines_to_proccess=100, inserts_per_line_to_proccess=100)
 
