@@ -77,8 +77,8 @@ def create_page_links_map(lines_to_proccess=-1, inserts_per_line_to_proccess=-1)
 				print(str(temp_pageid) + ": " + str(links[temp_pageid]))
 			line_no += 1
 
-			if 0 <= lines_to_proccess < line_no:
-				 break
+			#if 0 <= lines_to_proccess < line_no:
+			#	break
 	print('Article links map created in: ' + str(time.time() - start) + 's.')
 
 	return links
@@ -91,12 +91,12 @@ def createJSON(links):
 	for parent, child in links.items():
 		pagelinks = str(parent)
 		for el in child:
-			pagelinks += "," + str(el) #creating long string consisted of ID and children IDs based on links dict
+			pagelinks += "," + str(el)  # creating long string consisted of ID and children IDs based on links dict
 		json_object['pagelinks'].append({
 			'pl': pagelinks
 		})
-	with open (DUMPS_PATH + OUTFILE, 'w') as outfile:
-		json.dump(json_object,outfile )
+	with open(DUMPS_PATH + OUTFILE, 'w') as outfile:
+		json.dump(json_object, outfile)
 
 
 if not os.path.isfile(TITLE_ID_MAP_PATH):
