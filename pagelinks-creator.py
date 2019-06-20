@@ -57,34 +57,48 @@ def create_page_links_map(lines_to_proccess=-1, inserts_per_line_to_proccess=-1)
 				continue
 			if len(line.split(' ')) != 5:  # line has to have minimum 5 parts when it's an insert
 				print('Inserts line ' + str(line_no) + ' has unusual number of spaces ' + str(len(line.split(' '))))
-			inserts = line.split(' ')[-1]  # extracting part with values to insert in one string
-			value_list = re.findall(r"(\d+,\d+,'(?:[^'\\]|\\.)*',\d+)",
-			                        inserts)  # extracting string with 4 values, separated by comma and backslashes
+			inserts = line.split(' ')[4:]  # extracting part with values to insert in one string
+			inserts = ''.join(inserts)
+			value_list = inserts.split('),(')
+			# extracting string with 4 values, separated by comma and backslashes
 			for i in range(len(value_list)):
 				#	if 0 <= inserts_per_line_to_proccess < i:
 				#		break
-				values = value_list[i].split(',')  # splittig each of 4 values separately
-				title = values[2].replace('_', ' ').replace('\\', '')[
-				        1:-1]  # trying to make title look like in indexes file
-				page_id = int(values[0])  # extracting page id
-				temp_pageid = page_id
-				if not page_id in links:
-					links[page_id] = []  # if occurs for the first time, create empty value
-				if title in title_to_id:
-					links[page_id].append(
-						title_to_id[title])  # if managed to find id based on title, append it as child to page
+				values = value_list[i].split('\'')  # splittig each of 4 values separately
+				if (len(values) == 3):
+					try:
+						title = values[1]  # trying to make title look like in indexes file
+					except:
+						title = 'Wrong splitting of values!!!'
+						print('bad title! - Line number' + str(line_no) + ', value: ' + value_list[i])
+					id_getter = values[0].split(',')
+					if i == 0:
+						page_id = int(id_getter[0][1:])  # deleting bracket in first occurance
+					else:
+						try:
+							page_id = int(id_getter[0])
+						except:
+							page_id = 0
+							print('bad id! - Line number' + str(line_no) + ', inserted data number: ' + str(i))
+					temp_pageid = page_id
+					if not page_id in links:
+						links[page_id] = []  # if occurs for the first time, create empty value
+					if title in title_to_id:
+						links[page_id].append(
+							title_to_id[title])  # if managed to find id based on title, append it as child to page
 			if line_no % 100 == 0:
-				print(str(temp_pageid) + ": " + str(links[temp_pageid]))
+				print(str(line_no))
 			line_no += 1
 
-			#if 0 <= lines_to_proccess < line_no:
-			#	break
+	# if 0 <= lines_to_proccess < line_no:
+	#	break
 	print('Article links map created in: ' + str(time.time() - start) + 's.')
 
 	return links
 
 
 def createJSON(links):
+	print('Creation of map started...')
 	json_object = {}
 	json_object['pagelinks'] = []
 
@@ -99,9 +113,11 @@ def createJSON(links):
 		json.dump(json_object, outfile)
 
 
+
 if not os.path.isfile(TITLE_ID_MAP_PATH):
 	if not os.path.exists("data-files/"):
 		os.makedirs(os.path.dirname(TITLE_ID_MAP_PATH))
 	save_title_to_id_map()
 title_to_id = load_title_to_id_map()
 createJSON(create_page_links_map(400))
+print('Completed.')
