@@ -1,2 +1,5 @@
 .idea/
 data-files/
+.vs/
+packages/
+wikigraph-parser/bin/
