@@ -13,7 +13,7 @@ namespace wikigraph_parser
     class DumpDownload {
 
         private MainWindow window;
-        private string rootURL = "https://dumps.wikimedia.org";
+        private string rootURL = "http://dumps.wikimedia.your.org";
         private Dictionary<string, long> progress = new Dictionary<string, long>();
         private double totalToRecive = 0;
 

@@ -45,7 +45,7 @@ namespace wikigraph_parser {
 
         public bool fetchAllDumpsLoading = false;
         public bool allInputsReady = false;
-        public string dumpFetchURL = "https://dumps.wikimedia.org/index.json";
+        public string dumpFetchURL = "http://dumps.wikimedia.your.org/index.json";
         public string[] neededJobs = {"pagetable", "categorytable", "pagelinkstable", "categorylinkstable"};
         public int memoryMultiplier = 10;
         public Stopwatch stopWatch = new Stopwatch();
