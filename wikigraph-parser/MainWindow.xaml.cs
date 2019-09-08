@@ -46,7 +46,8 @@ namespace wikigraph_parser {
         public bool fetchAllDumpsLoading = false;
         public bool allInputsReady = false;
         public string dumpFetchURL = "http://dumps.wikimedia.your.org/index.json";
-        public string[] neededJobs = {"pagetable", "categorytable", "pagelinkstable", "categorylinkstable"};
+        public string[] neededJobs = {"pagetable", "pagelinkstable", "categorylinkstable"};
+        public int numberOfFiles = 3;
         public int memoryMultiplier = 10;
         public Stopwatch stopWatch = new Stopwatch();
         public DispatcherTimer dispatcherTimer = new DispatcherTimer();
@@ -216,7 +217,7 @@ namespace wikigraph_parser {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            if (!this.fetchAllDumpsLoading && path.Text != "/" && dump_list.SelectedIndex != -1) {
+            if (!this.fetchAllDumpsLoading && path.Text != "\\" && dump_list.SelectedIndex != -1) {
                 this.allInputsReady = true;
                 BackgroudAnimation(true);
                 StartProcess((WikiDump)dump_list.SelectedItem, path.Text);

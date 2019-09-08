@@ -20,7 +20,7 @@ namespace wikigraph_parser
         public async Task Start(WikiDump dump, string path) {
             try {
                 var tasks = new List<Task>();
-                window.UpdateProgress(2, 0, "Decompressed " + filesDecompressed + " out of 4 files");
+                window.UpdateProgress(2, 0, "Decompressed " + filesDecompressed + " out of " + window.numberOfFiles + " files");
                 foreach (string file in dump.Files) {
                     tasks.Add(DecompressGZip(new FileInfo(path + file.Replace('/', '\\'))));
                 }
@@ -43,7 +43,7 @@ namespace wikigraph_parser
             using (var output = File.OpenWrite(newFileName))
             using (var gz = new GZipStream(input, CompressionMode.Decompress)) {
                 await gz.CopyToAsync(output);
-                window.UpdateProgress(2, 0.25*(++filesDecompressed), "Decompressed " + filesDecompressed + " out of 4 files");
+                window.UpdateProgress(2, 0.33333*(++filesDecompressed), "Decompressed " + filesDecompressed + " out of " + window.numberOfFiles + " files");
             }
         }
 
