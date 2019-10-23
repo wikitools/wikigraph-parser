@@ -39,6 +39,8 @@ namespace wikigraph_parser {
                 // Page and category titles
                 files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("page.sql")).Replace('/', '\\').Replace(".gz", "")));
                 await CreateTitlesMaps(files[0]);
+                sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
+                sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
 
                 // Titles sorting (for later use)
                 /*

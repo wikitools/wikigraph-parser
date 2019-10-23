@@ -3,3 +3,4 @@ data-files/
 .vs/
 packages/
 wikigraph-parser/bin/
+wikigraph-parser/obj/
