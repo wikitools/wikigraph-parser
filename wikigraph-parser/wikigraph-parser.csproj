@@ -101,6 +101,7 @@
     <Compile Include="DumpDecompress.cs" />
     <Compile Include="DumpDownload.cs" />
     <Compile Include="DumpRead.cs" />
+    <Compile Include="FileCreator.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

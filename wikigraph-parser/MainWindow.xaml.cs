@@ -28,8 +28,9 @@ namespace wikigraph_parser {
 
     public class WikiDump {
 
-        public string Name { get; set; }
-        public DateTime LastUpdated { get; set; }
+		public string Name { get; set; }
+		public string Date { get; set; }
+		public DateTime LastUpdated { get; set; }
         public double Size { get; set; }
         public List<string> Files { get; set; }
         public bool IsReady { get; set; }
@@ -82,7 +83,8 @@ namespace wikigraph_parser {
                 foreach (string job in neededJobs) {
                     if ((string)result.Children().ToList()[0]["jobs"][job]["status"] == "done") {
                         dump.LastUpdated = DateTime.Parse((string)result.Children().ToList()[0]["jobs"][job]["updated"]);
-                        dump.Files.Add((string)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["url"]);
+						dump.Date = ((string)result.Children().ToList()[0]["jobs"][job]["updated"]).Replace("-", "").Substring(0, 8);
+						dump.Files.Add((string)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["url"]);
                         fileSize += (long)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["size"];
                     } else {
                         dump.Name = ((JProperty)result).Name + " (in progress)"; 
@@ -287,9 +289,11 @@ namespace wikigraph_parser {
 
             // Creating WG files
             ActivateProgressStep(4);
+			FileCreator fileCreator = new FileCreator(this);
+			await fileCreator.Start(dump, path);
 
-            // Finishing up (clean up)
-            ActivateProgressStep(5);
+			// Finishing up (clean up)
+			ActivateProgressStep(5);
 
 
             ActivateProgressStep(6);

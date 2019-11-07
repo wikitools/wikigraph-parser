@@ -285,7 +285,7 @@
                 Margin="30,323,0,0"/>
             <Label 
                 x:Name="step2_hint" 
-                Content="Enter a path for WikiGraph build folder (/StreamingAssets)" 
+                Content="Enter a path for WikiGraph build folder (\StreamingAssets)" 
                 HorizontalAlignment="Left" 
                 VerticalAlignment="Top" 
                 FontSize="12" 
