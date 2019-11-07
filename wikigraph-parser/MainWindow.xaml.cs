@@ -83,7 +83,7 @@ namespace wikigraph_parser {
                 foreach (string job in neededJobs) {
                     if ((string)result.Children().ToList()[0]["jobs"][job]["status"] == "done") {
                         dump.LastUpdated = DateTime.Parse((string)result.Children().ToList()[0]["jobs"][job]["updated"]);
-						dump.Date = ((string)result.Children().ToList()[0]["jobs"][job]["updated"]).Replace("-", "").Substring(0, 8);
+						dump.Date = ((string)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["url"]).Substring(dump.Name.Length+2, 8);
 						dump.Files.Add((string)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["url"]);
                         fileSize += (long)result.Children().ToList()[0]["jobs"][job]["files"].First.Children().ToList()[0]["size"];
                     } else {
