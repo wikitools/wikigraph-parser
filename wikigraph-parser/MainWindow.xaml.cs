@@ -108,7 +108,7 @@ namespace wikigraph_parser {
                 this.fetchAllDumpsLoading = true;
                 AnimateLoader(loading_icon, this.fetchAllDumpsLoading);
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(FetchAllDumpsCompleted);
-                wc.DownloadStringAsync(new Uri(url));
+                wc.DownloadStringAsync(new Uri(url)); 
             }
         }
 

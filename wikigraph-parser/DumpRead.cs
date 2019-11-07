@@ -22,14 +22,18 @@ namespace wikigraph_parser {
         private MainWindow window;
         private int numberOfFiles = 5;
         private int filesCreated = 0;
-        private Dictionary<string, string> pageTitles;
-        private Dictionary<string, string> categoryTitles;
+		private Dictionary<string, string> pageTitles;
+		private Dictionary<string, string> categoryTitles;
+		private Dictionary<string, bool> pageIDs;
+		private Dictionary<string, bool> categoryIDs;
 
-        public DumpRead(MainWindow window) {
+		public DumpRead(MainWindow window) {
             this.window = window;
-            this.pageTitles = new Dictionary<string, string>();
-            this.categoryTitles = new Dictionary<string, string>();
-        }
+			this.pageTitles = new Dictionary<string, string>();
+			this.categoryTitles = new Dictionary<string, string>();
+			this.pageIDs = new Dictionary<string, bool>();
+			this.categoryIDs = new Dictionary<string, bool>();
+		}
 
         public async Task Start(WikiDump dump, string path) {
             try {
@@ -39,43 +43,23 @@ namespace wikigraph_parser {
                 // Page and category titles
                 files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("page.sql")).Replace('/', '\\').Replace(".gz", "")));
                 await CreateTitlesMaps(files[0]);
-                sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
-                sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
+                await sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
+                await sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
 
-                // Titles sorting (for later use)
-                /*
-                foreach (FileInfo file in files) {
-                    string fileNameWithoutExtension = file.FullName.Substring(0, file.FullName.Length - 4);
-                    SortFile.SortDelimitedByAlphaNumKey(
-                        sourcefilePath: fileNameWithoutExtension + ".map",
-                        destinationFolder: file.DirectoryName,
-                        delimiter: Delimiters.Tab,
-                        keyColumn: 1,
-                        keyLength: 0,
-                        hasHeader: false,
-                        isUniqueKey: false,
-                        sortDir: SortDirection.Ascending
-                    );
-                    // Replace unsorted with sorted ones
-                    if (File.Exists(fileNameWithoutExtension + ".map") && File.Exists(fileNameWithoutExtension + "_sorted.map")) {
-                        File.Delete(fileNameWithoutExtension + ".map");
-                        File.Move(fileNameWithoutExtension + "_sorted.map", fileNameWithoutExtension + ".map");
-                    }
-                    pageTitlesPath = fileNameWithoutExtension.Contains("page") ? fileNameWithoutExtension + ".map" : pageTitlesPath;
-                    categoryTitlesPath = fileNameWithoutExtension.Contains("category") ? fileNameWithoutExtension + ".map" : categoryTitlesPath;
-                }
-                */
+				// Titles sorting (for search use)
+				await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
+				await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
 
-                // Page to page links
-                files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("pagelinks.sql")).Replace('/', '\\').Replace(".gz", "")));
+				// Page to page links
+				files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("pagelinks.sql")).Replace('/', '\\').Replace(".gz", "")));
                 await CreatePageLinksMap(files[1], DUMP_TYPE.PAGELINKS);
-                sortMapnumeric(files[1].FullName.Substring(0, files[1].FullName.Length - 4), files[1].DirectoryName);
+                await sortMapnumeric(files[1].FullName.Substring(0, files[1].FullName.Length - 4), files[1].DirectoryName);
 
                 // Category links
                 files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("categorylinks.sql")).Replace('/', '\\').Replace(".gz", "")));
                 await CreateCategoryLinksMap(files[2], DUMP_TYPE.CATEGORYLINKS);
-                sortMapnumeric(files[2].FullName.Substring(0, files[2].FullName.Length - 4) + "frompage", files[2].DirectoryName);
-                sortMapnumeric(files[2].FullName.Substring(0, files[2].FullName.Length - 4) + "fromcategory", files[2].DirectoryName);
+                await sortMapnumeric(files[2].FullName.Substring(0, files[2].FullName.Length - 4) + "frompage", files[2].DirectoryName);
+                await sortMapnumeric(files[2].FullName.Substring(0, files[2].FullName.Length - 4) + "fromcategory", files[2].DirectoryName);
 
                 // Deleting sql files
                 foreach (FileInfo file in files) {
@@ -87,8 +71,26 @@ namespace wikigraph_parser {
             }
         }
 
-        private void sortMapnumeric(string fileName, string directoryName, int keyColumn = 0) {
-            //Sort csv-like map
+		private async Task sortTitles(string fileName, string directoryName) {
+			// Create sorted txt file for node search
+			SortFile.SortDelimitedByAlphaNumKey(
+				sourcefilePath: fileName + ".map",
+				destinationFolder: directoryName,
+				delimiter: Delimiters.Tab,
+				keyColumn: 1,
+				keyLength: 0,
+				hasHeader: false,
+				isUniqueKey: false,
+				sortDir: SortDirection.Ascending
+			);
+			// Renaming sorted file
+			if (File.Exists(fileName + "_sorted.map")) {
+				File.Move(fileName + "_sorted.map", fileName + "-search.map");
+			}
+		}
+
+		private async Task sortMapnumeric(string fileName, string directoryName, int keyColumn = 0) {
+            // Sort csv-like map
             SortFile.SortDelimitedByNumericKey(
                 sourcefilePath: fileName + ".map",
                 destinationFolder: directoryName,
@@ -118,13 +120,26 @@ namespace wikigraph_parser {
                         var inserts = string.Join("", line.Split(' ').Skip(4));
                         var values = inserts.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
                         foreach (string value in values) {
-                            var data = value.Split(',');
-                            if (data[1] == "0") {
-                                pageTitles[data[2].Trim('\'')] = new String(data[0].Where(Char.IsDigit).ToArray());
-                            }
+
+							string title;
+							var data = value.Split(',');
+							if(data.Length > 13) {
+								title = "";
+								for(int j = 2; j < data.Length-10; j++) {
+									title += data[j] + (j != data.Length - 11 ? "," : "");
+								}
+								title = title.Trim('\'');
+							} else {
+								title = data[2].Trim('\'');
+							}
+							if (data[1] == "0") {
+                                pageTitles[title] = new String(data[0].Where(Char.IsDigit).ToArray());
+								pageIDs[new String(data[0].Where(Char.IsDigit).ToArray())] = true;
+							}
                             if (data[1] == "14") {
-                                categoryTitles[data[2].Trim('\'')] = new String(data[0].Where(Char.IsDigit).ToArray());
-                            }
+                                categoryTitles[title] = new String(data[0].Where(Char.IsDigit).ToArray());
+								categoryIDs[new String(data[0].Where(Char.IsDigit).ToArray())] = true;
+							}
                         }
                     }
                 }
@@ -162,7 +177,7 @@ namespace wikigraph_parser {
                             var to_page_title = data[2].Trim('\'');
                             if (data[1] == "0" && data[3] == "0") {
                                 pageTitles.TryGetValue(to_page_title, out to_page_id);
-                                if (to_page_id != null) {
+                                if (to_page_id != null && pageIDs.ContainsKey(from_page_id)) {
                                     if (!pageToPageLinkIndex.ContainsKey(from_page_id)) {
                                         pageToPageLinkIndex[from_page_id] = new HashSet<string>();
                                     }
@@ -200,13 +215,13 @@ namespace wikigraph_parser {
                         var to_category_title = data[1].Trim('\'');
                         categoryTitles.TryGetValue(to_category_title, out to_category_id);
                         if (to_category_id != null) {
-                            if (pageTitles.ContainsValue(from_id)) {
+                            if (pageIDs.ContainsKey(from_id)) {
                                 if (!pageToCategoryLinkIndex.ContainsKey(from_id)) {
                                     pageToCategoryLinkIndex[from_id] = new HashSet<string>();
                                 }
                                 pageToCategoryLinkIndex[from_id].Add(to_category_id);
                             }
-                            if (categoryTitles.ContainsValue(from_id)) {
+                            if (categoryIDs.ContainsKey(from_id)) {
                                 if (!categoryToCategoryLinkIndex.ContainsKey(from_id)) {
                                     categoryToCategoryLinkIndex[from_id] = new HashSet<string>();
                                 }
