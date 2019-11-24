@@ -142,7 +142,7 @@
                 RenderTransformOrigin="0.5,0.5"/>
             <Label 
                 x:Name="progress4_label" 
-                Content="Generating WikiGraph files" 
+                Content="Mapping graph data" 
                 HorizontalAlignment="Left" 
                 Margin="80,265,0,0" 
                 VerticalAlignment="Top"
@@ -160,6 +160,7 @@
                 Foreground="#3FFFFFFF" Padding="0,0,5,3" Background="#00000000"/>
             <ProgressBar 
                 x:Name="progress4" 
+                Tag="indeterminate"
                 HorizontalAlignment="Left" 
                 Height="10" 
                 Margin="80,295,0,0" 
@@ -179,7 +180,7 @@
                 RenderTransformOrigin="0.5,0.5"/>
             <Label 
                 x:Name="progress5_label" 
-                Content="Saving files and cleaning up" 
+                Content="Generating WikiGraph files" 
                 HorizontalAlignment="Left" 
                 Margin="80,340,0,0" 
                 VerticalAlignment="Top"
@@ -197,6 +198,7 @@
                 Foreground="#3FFFFFFF" Padding="0,0,5,3" Background="#00000000"/>
             <ProgressBar 
                 x:Name="progress5" 
+                Tag="indeterminate"
                 HorizontalAlignment="Left" 
                 Height="10" 
                 Margin="80,370,0,0" 
@@ -285,7 +287,7 @@
                 Margin="30,323,0,0"/>
             <Label 
                 x:Name="step2_hint" 
-                Content="Enter a path for WikiGraph build folder (\StreamingAssets)" 
+                Content="Enter a path for WikiGraph build folder (ending with \StreamingAssets\DataFiles)" 
                 HorizontalAlignment="Left" 
                 VerticalAlignment="Top" 
                 FontSize="12" 
