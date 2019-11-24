@@ -47,8 +47,8 @@ namespace wikigraph_parser {
                 await sortMapnumeric(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
 
 				// Titles sorting (for search use)
-				await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
-				await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
+				//await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 4), files[0].DirectoryName);
+				//await sortTitles(files[0].FullName.Substring(0, files[0].FullName.Length - 8) + "category", files[0].DirectoryName);
 
 				// Page to page links
 				files.Add(new FileInfo(path + Array.Find(dump.Files.ToArray(), (el) => el.Contains("pagelinks.sql")).Replace('/', '\\').Replace(".gz", "")));

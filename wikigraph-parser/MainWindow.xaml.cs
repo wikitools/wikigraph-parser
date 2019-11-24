@@ -290,13 +290,13 @@ namespace wikigraph_parser {
             // Creating WG files
             ActivateProgressStep(4);
 			FileCreator fileCreator = new FileCreator(this);
-			await fileCreator.Start(dump, path);
+			await fileCreator.PrepareMaps(dump, path);
 
 			// Finishing up (clean up)
 			ActivateProgressStep(5);
+			await fileCreator.CreateGraphFiles();
 
-
-            ActivateProgressStep(6);
+			ActivateProgressStep(6);
             stopWatch.Stop();
 
         }
